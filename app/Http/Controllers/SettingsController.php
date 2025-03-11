@@ -336,6 +336,8 @@ class SettingsController extends Controller
         $setting->dash_chart_type = $request->input('dash_chart_type');
         $setting->profile_edit = $request->input('profile_edit', 0);
         $setting->require_checkinout_notes = $request->input('require_checkinout_notes', 0);
+        $setting->default_checkout = $request->input('default_checkout');
+        $setting->default_checkin = $request->input('default_checkin');
 
 
         if ($request->input('per_page') != '') {

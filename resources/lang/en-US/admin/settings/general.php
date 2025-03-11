@@ -397,7 +397,8 @@ return [
     'due_checkin_days_help' => 'How many days before the expected checkin of an asset should it be listed in the "Due for checkin" page?',
     'no_groups' => 'No groups have been created yet. Visit <code>Admin Settings > Permission Groups</code> to add one.',
     'text' => 'Text',
-
+    'default_checkout_status' => 'Default Checkout Status',
+    'default_checkin_status' => 'Default Checkin Status',
 
     'logo_option_types' => [
         'text' => 'Text',

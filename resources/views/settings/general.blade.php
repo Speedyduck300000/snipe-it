@@ -234,6 +234,45 @@
                                <p class="help-block">{{ trans('admin/settings/general.require_checkinout_notes_help_text') }}</p>
                        </div>
                    </div>
+
+
+                  <!-- Set default Asset Checkout Status -->
+                    <div class="form-group {{ $errors->has('default_checkout') ? 'error' : '' }}">
+                        <div class="col-md-3">
+                            <label for="default_checkout">{{ trans('admin/settings/general.default_checkout_status') }}</label>
+                        </div>
+                        <div class="col-md-9">
+                            @php
+                                // Load all deployable Statuslabels
+                                $statusOptions = \App\Models\Statuslabel::where('deployable', true)->pluck('name', 'id');
+                            @endphp
+
+                            {{ Form::select('default_checkout', $statusOptions, old('default_checkout', $setting->default_checkout), [
+                                'class' => 'select2',
+                                'style' => 'width: 80%',
+                                'id' => 'default_checkout'
+                            ]) }}
+                        </div>
+                    </div>
+
+                    <!-- Set default Asset Checkin Status -->
+                    <div class="form-group {{ $errors->has('default_checkin') ? 'error' : '' }}">
+                        <div class="col-md-3">
+                            <label for="default_checkin">{{ trans('admin/settings/general.default_checkin_status') }}</label>
+                        </div>
+                        <div class="col-md-9">
+                            @php
+                                // Load all Statuslabels
+                                $statusOptions = \App\Models\Statuslabel::all()->pluck('name', 'id');
+                            @endphp
+
+                            {{ Form::select('default_checkin', $statusOptions, old('default_checkin', $setting->default_checkin), [
+                                'class' => 'select2',
+                                'style' => 'width: 80%',
+                                'id' => 'default_checkin'
+                            ]) }}
+                        </div>
+                    </div> 
                    <!-- /.form-group -->
 
 
