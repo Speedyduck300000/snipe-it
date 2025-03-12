@@ -398,7 +398,9 @@ return [
     'no_groups' => 'No groups have been created yet. Visit <code>Admin Settings > Permission Groups</code> to add one.',
     'text' => 'Text',
     'default_checkout_status' => 'Default Checkout Status',
+    'default_checkout_status_no_default_set' => 'No Default Set',
     'default_checkin_status' => 'Default Checkin Status',
+    'default_checkin_status_no_default_set' => 'No Default Set',
 
     'logo_option_types' => [
         'text' => 'Text',

@@ -247,13 +247,18 @@
                                 $statusOptions = \App\Models\Statuslabel::where('deployable', true)->pluck('name', 'id');
                             @endphp
 
-                            {{ Form::select('default_checkout', $statusOptions, old('default_checkout', $setting->default_checkout), [
-                                'class' => 'select2',
-                                'style' => 'width: 80%',
-                                'id' => 'default_checkout'
-                            ]) }}
+                            <select name="default_checkout" id="default_checkout" class="select2" style="width: 80%">
+                                <!-- Option to delete the currently set value -->
+                                <option value="">{{ trans('admin/settings/general.default_checkout_status_no_default_set') }}</option> 
+                                @foreach ($statusOptions as $id => $name)
+                                    <option value="{{ $id }}" {{ old('default_checkout', $setting->default_checkout) == $id ? 'selected' : '' }}>
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
+
 
                     <!-- Set default Asset Checkin Status -->
                     <div class="form-group {{ $errors->has('default_checkin') ? 'error' : '' }}">
@@ -266,11 +271,15 @@
                                 $statusOptions = \App\Models\Statuslabel::all()->pluck('name', 'id');
                             @endphp
 
-                            {{ Form::select('default_checkin', $statusOptions, old('default_checkin', $setting->default_checkin), [
-                                'class' => 'select2',
-                                'style' => 'width: 80%',
-                                'id' => 'default_checkin'
-                            ]) }}
+                            <select name="default_checkin" id="default_checkin" class="select2" style="width: 80%">
+                                <!-- Option to delete the currently set value -->
+                                <option value="">{{ trans('admin/settings/general.default_checkin_status_no_default_set') }}</option> 
+                                @foreach ($statusOptions as $id => $name)
+                                    <option value="{{ $id }}" {{ old('default_checkin', $setting->default_checkin) == $id ? 'selected' : '' }}>
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div> 
                    <!-- /.form-group -->
