@@ -85,7 +85,7 @@
                                 <x-input.select
                                     name="status_id"
                                     :options="$statusLabel_list"
-                                    :selected="$asset->status_id"
+                                    :selected="$snipeSettings ->default_checkout ?? $asset->status_id"
                                     style="width: 100%;"
                                     aria-label="status_id"
                                 />

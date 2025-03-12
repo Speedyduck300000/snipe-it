@@ -88,6 +88,7 @@
                                                     name="status_id"
                                                     id="modal-statuslabel_types"
                                                     :options="$statusLabel_list"
+                                                    :selected="$snipeSettings->default_checkin ?? ''"
                                                     style="width: 100%"
                                                     aria-label="status_id"
                                                 />
