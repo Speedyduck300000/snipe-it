@@ -233,7 +233,7 @@
                     </div>
                   @endif
 
-                  <!-- locationm -->
+                  <!-- location -->
                   @if ($consumable->location)
                     <div class="row">
                       <div class="col-md-3">

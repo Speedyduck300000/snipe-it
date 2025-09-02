@@ -16,17 +16,22 @@ class ConsumableAssignment extends Model
     protected $fillable = [
         'consumable_id',
         'assigned_to',
-        'asset_id',
+        'assigned_type',
         'note'
     ];
 
-    public $rules = [
-        
+    protected $rules = [
+
     ];
 
     public function consumable()
     {
         return $this->belongsTo(\App\Models\Consumable::class);
+    }
+
+    public function assignedTo()
+    {
+        return $this->morphTo(null, 'assigned_type', 'assigned_to');
     }
 
     public function user()
@@ -36,7 +41,7 @@ class ConsumableAssignment extends Model
 
     public function asset()
     {
-        return $this->belongsTo(\App\Models\Asset::class, 'asset_id');
+        return $this->belongsTo(\App\Models\Asset::class, 'assigned_to');
     }
 
     public function adminuser()

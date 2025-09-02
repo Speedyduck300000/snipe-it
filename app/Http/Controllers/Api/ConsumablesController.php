@@ -232,6 +232,10 @@ class ConsumablesController extends Controller
                     'id' => (int) $consumable_assignment->user->id,
                     'name'=> e($consumable_assignment->user->display_name),
                 ] : null,
+                'asset' => ($consumable_assignment->asset) ? [
+                    'id' => (int) $consumable_assignment->asset->id,
+                    'name'=> e($consumable_assignment->asset->name),
+                ] : null,
                 'created_at' => Helper::getFormattedDateObject($consumable_assignment->created_at, 'datetime'),
                 'note' => ($consumable_assignment->note) ? e($consumable_assignment->note) : null,
                 'created_by' => ($consumable_assignment->adminuser) ? [
