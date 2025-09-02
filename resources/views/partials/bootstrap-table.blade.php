@@ -338,6 +338,7 @@
                   'deployed': '{{ strtolower(trans('general.deployed')) }}',
                   'deployable': '{{ strtolower(trans('admin/hardware/general.deployable')) }}',
                   'archived': '{{ strtolower(trans('general.archived')) }}',
+                  'undeployable': '{{ strtolower(trans('general.undeployable')) }}',
                   'pending': '{{ strtolower(trans('general.pending')) }}'
                 }
 
