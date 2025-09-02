@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('consumables_users', function (Blueprint $table) {
             if (!Schema::hasColumn('consumables_users', 'asset_id')) {
-                    $table->Integer('asset_id')->after('assigned_to')->nullable()->default(null);
+                    $table->text('assigned_type')->after('assigned_to')->nullable()->default(null);
                 }
         });
     }
@@ -26,8 +26,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('consumables_users', function (Blueprint $table) {
-            if (Schema::hasColumn('consumables_users', 'asset_id')) {
-                $table->dropColumn('asset_id');
+            if (Schema::hasColumn('consumables_users', 'assigned_type')) {
+                $table->dropColumn('assigned_type');
             }
         });
     }

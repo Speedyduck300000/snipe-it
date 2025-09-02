@@ -13,8 +13,15 @@ class ConsumableAssignment extends Model
 
     protected $table = 'consumables_users';
 
+    protected $fillable = [
+        'consumable_id',
+        'assigned_to',
+        'asset_id',
+        'note'
+    ];
+
     public $rules = [
-        'assigned_to'        => 'required|exists:users,id',
+        
     ];
 
     public function consumable()
