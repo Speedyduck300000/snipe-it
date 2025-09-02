@@ -27,6 +27,11 @@ class ConsumableAssignment extends Model
         return $this->belongsTo(\App\Models\User::class, 'assigned_to');
     }
 
+    public function asset()
+    {
+        return $this->belongsTo(\App\Models\Asset::class, 'asset_id');
+    }
+
     public function adminuser()
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');

@@ -6,6 +6,7 @@ use App\Events\CheckoutableCheckedOut;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Consumable;
+use App\Models\ConsumableAssignment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use \Illuminate\Contracts\View\View;
@@ -68,7 +69,7 @@ class ConsumableCheckoutController extends Controller
         }
 
         $this->authorize('checkout', $consumable);
-
+        
         // If the quantity is not present in the request or is not a positive integer, set it to 1
         $quantity = $request->input('checkout_qty');
         if (!isset($quantity) || !ctype_digit((string)$quantity) || $quantity <= 0) {
@@ -81,37 +82,102 @@ class ConsumableCheckoutController extends Controller
         }
 
         $admin_user = auth()->user();
-        $assigned_to = e($request->input('assigned_to'));
+        
+        $consumable = Consumable::with([
+            'consumableAssignments:id,consumable_id,assigned_to,asset_id,created_by,note,created_at',
+            'consumableAssignments.user:id,first_name,last_name',
+            'consumableAssignments.asset:id,asset_tag,name',
+        ])->findOrFail($consumableId);
 
-        // Check if the user exists
-        if (is_null($user = User::find($assigned_to))) {
-            // Redirect to the consumable management page with error
-            return redirect()->route('consumables.checkout.show', $consumable)->with('error', trans('admin/consumables/message.checkout.user_does_not_exist'))->withInput();
+        // Zugriff:
+        foreach ($consumable->consumableAssignments as $asgn) {
+            $userId  = $asgn->assigned_to;
+            $assetId = $asgn->asset_id;
+            $user    = $asgn->user;   // optional vor-geladen
+            $asset   = $asgn->asset;  // optional vor-geladen
         }
 
-        // Update the consumable data
-        $consumable->assigned_to = e($request->input('assigned_to'));
 
         for ($i = 0; $i < $quantity; $i++){
-        $consumable->users()->attach($consumable->id, [
+        $consumable->users()->attach($consumable->id, [ 
             'consumable_id' => $consumable->id,
             'created_by' => $admin_user->id,
             'assigned_to' => e($request->input('assigned_to')),
+            'asset_id' => e($request->input('assigned_to')),
             'note' => $request->input('note'),
         ]);
         }
-
+        
         $consumable->checkout_qty = $quantity;
-        event(new CheckoutableCheckedOut($consumable, $user, auth()->user(), $request->input('note')));
 
-        $request->request->add(['checkout_to_type' => 'user']);
-        $request->request->add(['assigned_user' => $user->id]);
+        $consumable = $this->findConsumableToCheckout($consumable, $consumableId);
 
-        session()->put(['redirect_option' => $request->get('redirect_option'), 'checkout_to_type' => $request->get('checkout_to_type')]);
+        if($request->filled('asset_id')){
 
+            $checkoutTarget = $this->checkoutToAsset($consumable);
+            $request->request->add(['assigned_asset' => $checkoutTarget->id]);
+            session()->put(['redirect_option' => $request->get('redirect_option'), 'checkout_to_type' => 'asset']);
 
-        // Redirect to the new consumable page
+        } elseif ($request->filled('assigned_to')) {
+            $checkoutTarget = $this->checkoutToUser($consumable);
+            $request->request->add(['assigned_user' => $checkoutTarget->id]);
+            session()->put(['redirect_option' => $request->get('redirect_option'), 'checkout_to_type' => 'user']);
+        }
+
+        if (isset($checkoutTarget)) {
+            return Helper::getRedirectOption($request, $consumable->id, 'Consumables')
+                ->with('success', trans('admin/consumables/message.checkout.success'));
+        }
+
         return Helper::getRedirectOption($request, $consumable->id, 'Consumables')
-            ->with('success', trans('admin/consumables/message.checkout.success'));
+            ->with('error', trans('admin/consumables/message.checkout.error'));
+    }
+
+    protected function findConsumableToCheckout($consumable, $consumableId)
+    {
+        $consumable = ConsumableAssignment::find($consumableId);
+
+        if (! $consumable) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(redirect()->route('consumables.index')->with('error', trans('admin/consumables/message.checkout.unavailable')));    
+        }
+        return $consumable;
+    }
+
+    protected function checkoutToUser($consumable)
+    {
+        dd($consumable);
+        //Check if the user exists
+        if (is_null($target = User::find(request('assigned_to')))) {
+            // Redirect to the consumable management page with error
+            return redirect()->route('consumables.checkout.show', $consumable)->with('error', trans('admin/consumables/message.checkout.user_does_not_exist'))->withInput();
+        }
+        $consumable->assigned_to = request('assigned_to');
+        
+        if ($consumable->save()) {
+            event(new CheckoutableCheckedOut($consumable, $target, auth()->user(), request('notes')));
+            return $target;
+        }
+
+    
+        return false;
+    }
+
+    protected function checkoutToAsset($consumable)
+    {
+        if (is_null($target = Asset::find(request('asset_id')))) {
+            return redirect()->route('consumable.index')->with('error', trans('admin/consumable/message.asset_does_not_exist'));
+        }
+        $consumable->asset_id = request('asset_id');
+
+        // Override asset's assigned user if available
+        if ($target->checkedOutToUser()) {
+            $consumable->assigned_to = $target->assigned_to;
+        }
+        if ($consumable->save()) {
+            event(new CheckoutableCheckedOut($consumable, $target, auth()->user(), request('notes')));
+            return $target;
+        }
+
+        return false;
     }
 }
